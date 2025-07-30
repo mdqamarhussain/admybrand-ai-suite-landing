@@ -1,49 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
-const Navbar = () => {
+// TypeScript interfaces (moved to top)
+interface NavItem {
+  name: string;
+  href: string;
+}
+
+interface NavbarProps {
+  className?: string;
+}
+
+// Move navItems outside component to prevent recreation on every render
+const NAV_ITEMS: NavItem[] = [
+  { name: "Features", href: "#features" },
+  { name: "Pricing", href: "#pricing" },
+  { name: "FAQ", href: "#faq" },
+  { name: "Contact", href: "#contact" }
+];
+
+const Navbar: React.FC<NavbarProps> = ({ className = "" }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "FAQ", href: "#faq" },
-    { name: "Contact", href: "#contact" }
-  ];
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    setIsScrolled(window.scrollY > 20);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    // Update active section based on scroll position
+    const sections = NAV_ITEMS.map(item => item.href.slice(1));
+    const scrollPosition = window.scrollY + 100;
 
-      // Update active section based on scroll position
-      const sections = navItems.map(item => item.href.slice(1));
-      const scrollPosition = window.scrollY + 100;
-
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section);
-            break;
-          }
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const { offsetTop, offsetHeight } = element;
+        if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+          setActiveSection(section);
+          break;
         }
       }
-      
-      // Clear active section if at top
-      if (window.scrollY < 100) {
-        setActiveSection("");
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    }
+    
+    // Clear active section if at top
+    if (window.scrollY < 100) {
+      setActiveSection("");
+    }
   }, []);
 
-  const handleNavClick = (href: string) => {
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  const handleNavClick = (href: string): void => {
     const element = document.getElementById(href.slice(1));
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -54,7 +66,7 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled ? 'glass' : 'bg-transparent'
-    }`}>
+    } ${className}`}>
       <div className="container-custom py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -66,10 +78,12 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item: NavItem) => (
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
+                aria-label={`Navigate to ${item.name} section`}
+                aria-current={activeSection === item.href.slice(1) ? 'page' : undefined}
                 className={`relative text-sm font-medium transition-colors duration-300 ${
                   activeSection === item.href.slice(1)
                     ? 'text-primary'
@@ -97,11 +111,12 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden glass rounded-lg p-2"
               aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? (
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-white" aria-hidden="true" />
               ) : (
-                <Menu className="w-5 h-5 text-white" />
+                <Menu className="w-5 h-5 text-white" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -111,10 +126,11 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 glass rounded-2xl p-6 animate-fade-in">
             <div className="space-y-4">
-              {navItems.map((item) => (
+              {NAV_ITEMS.map((item: NavItem) => (
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
+                  aria-label={`Navigate to ${item.name} section`}
                   className={`block w-full text-left text-sm font-medium transition-colors duration-300 ${
                     activeSection === item.href.slice(1)
                       ? 'text-primary'
