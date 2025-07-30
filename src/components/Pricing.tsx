@@ -266,26 +266,7 @@ const Pricing = () => {
           ))}
         </div>
 
-        {/* Social Proof */}
-        <div className={`text-center mt-16 transition-all duration-700 delay-500 ${
-          titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <div className="glass rounded-2xl p-8 max-w-4xl mx-auto">
-            <p className="text-lg text-muted-foreground mb-6">
-              "ADmyBRAND AI Suite increased our campaign ROI by 340% in just 3 months. 
-              The AI optimization is simply incredible."
-            </p>
-            <div className="flex items-center justify-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">SJ</span>
-              </div>
-              <div className="text-left">
-                <div className="font-semibold text-white">Sarah Johnson</div>
-                <div className="text-sm text-muted-foreground">Marketing Director, TechCorp</div>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </Container>
     </section>
   );
