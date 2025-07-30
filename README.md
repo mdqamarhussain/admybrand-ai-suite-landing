@@ -1,5 +1,3 @@
------
-
 # ADmyBRAND AI Suite - Modern SaaS Landing Page
 
 > Premium landing page built with Vite + React, TypeScript, and Tailwind CSS featuring glassmorphism effects and smooth animations.
